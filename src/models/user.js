@@ -1,4 +1,4 @@
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { z } from "zod";
 
@@ -6,12 +6,7 @@ import config from "../config/index.js";
 
 const userSchema = mongoose.Schema(
 	{
-		userName: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		password: {
+		username: {
 			type: String,
 			required: true,
 			trim: true,
@@ -25,6 +20,11 @@ const userSchema = mongoose.Schema(
 				message: ({ value }) => `${value} is not a valid email address`,
 			},
 		},
+		password: {
+			type: String,
+			required: true,
+			trim: true,
+		},
 		description: {
 			type: String,
 			required: false,
@@ -35,22 +35,37 @@ const userSchema = mongoose.Schema(
 	}
 );
 
-userSchema.statics.checkIfExistingUser = async function (userName, email) {
+userSchema.statics.checkIfExistingEmail = async function (email) {
 	const schema = this;
+	const user = await schema.findOne({ email });
+	return user ? true : false;
+};
 
+userSchema.statics.checkIfExistingUsername = async function (username) {
+	const schema = this;
+	const user = await schema.findOne({ username });
+	return user ? true : false;
+};
+
+userSchema.statics.checkIfExistingUser = async function (usernameOrEmail) {
+	const schema = this;
 	const user = await schema.findOne({
-		$or: [{ email }, { userName }],
+		$or: [{ email: usernameOrEmail }, { userName: usernameOrEmail }],
 	});
 
-	if (user) return user;
-	return false;
+	return user;
+};
+
+userSchema.methods.verifyPassword = async function (password) {
+	const user = this;
+	return bcrypt.compare(password, user.password);
 };
 
 userSchema.pre("save", async function (next) {
 	const user = this;
 
 	if (user.isModified("password")) {
-		user.password = await bcryptjs.hash(
+		user.password = await bcrypt.hash(
 			user.password,
 			config.security.saltRounds
 		);

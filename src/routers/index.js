@@ -12,8 +12,6 @@ export const generateAPIRoutes = async () => {
 		if (!file.includes("index")) {
 			const routePrefix = file.replace(".js", "");
 			const routes = await import(`./${file}`);
-
-			console.log(`/${routePrefix}`);
 			router.use(`/${routePrefix}`, routes.default);
 		}
 	}

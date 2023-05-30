@@ -8,7 +8,6 @@ export const validate =
 
 		res.status(422);
 		const message = fromZodError(error);
-		console.log("error", message);
 		throw new Error(message);
 	};
 

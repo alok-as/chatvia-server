@@ -50,7 +50,7 @@ userSchema.statics.checkIfExistingUsername = async function (username) {
 userSchema.statics.checkIfExistingUser = async function (usernameOrEmail) {
 	const schema = this;
 	const user = await schema.findOne({
-		$or: [{ email: usernameOrEmail }, { userName: usernameOrEmail }],
+		$or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
 	});
 
 	return user;

@@ -30,8 +30,9 @@ export const computeTime = (value, unit) => {
 };
 
 export const getAuthTokenExpirations = () => {
-	const [accessValue, accessUnit] = config.security.accessExpiry;
-	const [refreshValue, refreshUnit] = config.security.refreshExpiry;
+	const [accessValue, accessUnit] = config.security.accessExpiry.split(" ");
+	const [refreshValue, refreshUnit] =
+		config.security.refreshExpiry.split(" ");
 
 	const accessExpiry = computeTime(accessValue, accessUnit);
 	const refreshExpiry = computeTime(refreshValue, refreshUnit);
@@ -47,44 +48,11 @@ export const generateJWTToken = (payload, expiresIn) =>
 export const verifyJWTToken = (token) =>
 	jwt.verify(token, config.security.jwtSecret);
 
-export const generateAuthTokens = async (payload, expirations) => {
-	const { accessExpiry, refreshExpiry } = expirations;
+export const generateAuthTokens = async (payload) => {
+	const { accessExpiry, refreshExpiry } = getAuthTokenExpirations();
 
 	return Promise.all([
 		generateJWTToken(payload, accessExpiry),
 		generateJWTToken(payload, refreshExpiry),
 	]);
-};
-
-export const setAuthTokens = async (res, payload) => {
-	const secure = config.server.environment === "production";
-	const sameSite = "none";
-
-	const { accessExpiry, refreshExpiry } = getAuthTokenExpirations();
-
-	const [accessToken, refreshToken] = await generateAuthTokens(payload, {
-		accessExpiry,
-		refreshExpiry,
-	});
-
-	res.cookie("accessToken", accessToken, {
-		httpOnly: true,
-		secure,
-		maxAge: accessExpiry * 1000,
-		sameSite,
-	});
-
-	res.cookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure,
-		maxAge: refreshExpiry * 1000,
-		sameSite,
-	});
-
-	res.cookie("isAuthenticated", true, {
-		httpOnly: false,
-		secure,
-		maxAge: refreshExpiry * 1000,
-		sameSite,
-	});
 };

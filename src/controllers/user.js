@@ -1,5 +1,5 @@
 import User from "../models/user.js";
-import { asyncHandler, setAuthTokens } from "../utils/index.js";
+import { asyncHandler, generateAuthTokens } from "../utils/index.js";
 
 export const createUser = asyncHandler(async (req, res) => {
 	const { username, email } = req.body;
@@ -30,14 +30,17 @@ export const createUser = asyncHandler(async (req, res) => {
 	const user = new User(req.body);
 	await user.save();
 
-	await setAuthTokens(res, {
+	const [accessToken, refreshToken] = generateAuthTokens({
 		id: user._id,
 		name: user.username,
 	});
 
 	res.send({
 		message: "User created successfully",
-		data: null,
+		data: {
+			accessToken,
+			refreshToken,
+		},
 		success: true,
 	});
 });
@@ -59,10 +62,18 @@ export const loginUser = asyncHandler(async (req, res) => {
 		throw new Error("Incorrect Password!");
 	}
 
+	const [accessToken, refreshToken] = await generateAuthTokens({
+		id: user._id,
+		name: user.username,
+	});
+
 	res.send({
 		message: "User successfully logged in",
 		success: true,
-		data: null,
+		data: {
+			accessToken,
+			refreshToken,
+		},
 	});
 });
 

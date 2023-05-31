@@ -16,7 +16,6 @@ const initializeServer = async () => {
 		app.use(
 			cors({
 				origin: config.client.origin,
-				credentials: true,
 			})
 		);
 		app.use(cookieParser());

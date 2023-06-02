@@ -11,20 +11,12 @@ export const createUser = asyncHandler(async (req, res) => {
 
 	if (isExistingEmail) {
 		res.status(409);
-		return res.send({
-			data: null,
-			message: `${email} already in use!`,
-			success: false,
-		});
+		throw new Error(`${email} already in use!`);
 	}
 
 	if (isExistingUsername) {
 		res.status(409);
-		return res.send({
-			data: null,
-			message: `${username} already in use!`,
-			success: false,
-		});
+		throw new Error(`${username} already in use!`);
 	}
 
 	const user = new User(req.body);

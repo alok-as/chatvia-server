@@ -45,8 +45,14 @@ export const generateJWTToken = (payload, expiresIn) =>
 		expiresIn,
 	});
 
-export const verifyJWTToken = (token) =>
-	jwt.verify(token, config.security.jwtSecret);
+export const verifyJWTToken = (token) => {
+	try {
+		const decoded = jwt.verify(token, config.security.jwtSecret);
+		return decoded;
+	} catch (error) {
+		return null;
+	}
+};
 
 export const generateAuthTokens = async (payload) => {
 	const { accessExpiry, refreshExpiry } = getAuthTokenExpirations();

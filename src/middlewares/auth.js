@@ -3,15 +3,11 @@ import { generateAuthTokens, verifyJWTToken } from "../utils/index.js";
 
 export const authenticated = async (req, res, next) => {
 	try {
-		console.log("headers", req.headers);
-		const accessToken = req.headers["authorization"].replace("Bearer ", "");
+		const accessToken = req.headers["authorization"];
 		const refreshToken = req.headers["refresh-token"];
 
-		console.log("accessToken", accessToken);
-		console.log("refreshToken", refreshToken);
-
 		if (accessToken) {
-			const decoded = verifyJWTToken(accessToken);
+			const decoded = verifyJWTToken(accessToken.replace("Bearer ", ""));
 
 			if (decoded) {
 				const { id, name } = decoded;

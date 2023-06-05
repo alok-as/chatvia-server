@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
 	createContact,
 	getUserContacts,
-	getUserContactsTest,
 	deleteContacts,
 } from "../controllers/contact.js";
 
@@ -14,10 +13,6 @@ const router = Router();
 
 router.post("/", authenticated, validate(contact), createContact);
 router.get("/", authenticated, getUserContacts);
-
-// Testing
-router.get("/user", getUserContactsTest);
-
 router.delete("/", deleteContacts);
 
 export default router;

@@ -56,35 +56,6 @@ export const getUserContacts = asyncHandler(async (req, res) => {
 	});
 });
 
-export const getUserContactsTest = asyncHandler(async (req, res) => {
-	const contacts = await Contact.aggregate([
-		{
-			$group: {
-				_id: { $substr: ["$name", 0, 1] },
-				contacts: { $push: "$$ROOT" },
-			},
-		},
-		{
-			$project: {
-				_id: 0,
-				initial: "$_id",
-				"contacts.name": 1,
-				"contacts.email": 1,
-				"contacts._id": 1,
-			},
-		},
-		{
-			$sort: { initial: 1 },
-		},
-	]);
-
-	res.send({
-		data: contacts,
-		message: "User Contacts fetched successfully",
-		success: true,
-	});
-});
-
 export const deleteContacts = asyncHandler(async (req, res) => {
 	await Contact.deleteMany({});
 

@@ -22,12 +22,12 @@ export const createUser = asyncHandler(async (req, res) => {
 	const user = new User(req.body);
 	await user.save();
 
-	const [accessToken, refreshToken] = generateAuthTokens({
+	const [accessToken, refreshToken] = await generateAuthTokens({
 		id: user._id,
 		name: user.username,
 	});
 
-	res.send({
+	res.status(201).send({
 		message: "User created successfully",
 		data: {
 			accessToken,

@@ -32,6 +32,11 @@ export const createUser = asyncHandler(async (req, res) => {
 		data: {
 			accessToken,
 			refreshToken,
+			profile: {
+				username: user.username,
+				email: user.email,
+				description: user.description,
+			},
 		},
 		success: true,
 	});
@@ -65,6 +70,11 @@ export const loginUser = asyncHandler(async (req, res) => {
 		data: {
 			accessToken,
 			refreshToken,
+			profile: {
+				username: user.username,
+				email: user.email,
+				description: user.description,
+			},
 		},
 	});
 });

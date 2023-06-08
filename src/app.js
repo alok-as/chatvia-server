@@ -15,14 +15,15 @@ const initializeServer = async () => {
 	try {
 		const app = express();
 		const port = config.server.port;
-
 		const server = http.createServer(app);
+
 		const io = new Server(server, {
 			cors: {
-				origin: config.client.origin,
+				origin: [config.client.origin],
 			},
+			serveClient: false,
+			path: "/connection/",
 		});
-		io.use(connectUser);
 
 		app.use(express.json());
 		app.use(
@@ -31,6 +32,7 @@ const initializeServer = async () => {
 			})
 		);
 		app.use(cookieParser());
+		io.use(connectUser);
 
 		await connectToDatabase();
 		const apiRoutes = await generateAPIRoutes();
@@ -38,6 +40,10 @@ const initializeServer = async () => {
 		app.use("/api", apiRoutes);
 		app.use(notFound);
 		app.use(errorHandler);
+
+		io.on("connection", (socket) => {
+			console.log("Server Ping");
+		});
 
 		server.listen(port, () => {
 			console.log(`Server is up and running on port ${port}`);

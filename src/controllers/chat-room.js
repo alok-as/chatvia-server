@@ -5,12 +5,21 @@ export const initiateChat = asyncHandler(async (req, res) => {
 	const { _id } = req.user;
 	const { userIds } = req.body;
 
-	console.log("_id", _id, userIds);
-
 	const room = await ChatRoom.initiateChat([...userIds, _id], _id);
 	res.status(201).send({
 		message: "Chat initiaited successfully",
 		data: room,
+		success: true,
+	});
+});
+
+export const getUsersChatRooms = asyncHandler(async (req, res) => {
+	const { _id } = req.user;
+	const chatRooms = await ChatRoom.find({ userIds: { $in: _id } });
+
+	res.status(201).send({
+		message: "Chats rooms fetched successfully",
+		data: chatRooms,
 		success: true,
 	});
 });

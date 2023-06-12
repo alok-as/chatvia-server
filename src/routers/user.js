@@ -2,8 +2,9 @@ import { Router } from "express";
 import {
 	createUser,
 	deleteUsers,
-	getUsers,
+	getUserProfile,
 	loginUser,
+	getUsers,
 } from "../controllers/user.js";
 
 import { login, user } from "../validations/user.js";
@@ -15,6 +16,8 @@ router.post("/", validate(user), createUser);
 router.post("/login", validate(login), loginUser);
 
 router.get("/", getUsers);
+router.get("/:id", getUserProfile);
+
 router.delete("/", deleteUsers);
 
 export default router;

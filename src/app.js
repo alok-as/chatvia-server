@@ -10,6 +10,7 @@ import { connectToDatabase } from "./database/index.js";
 import { errorHandler, notFound } from "./middlewares/app.js";
 import { connectUser } from "./middlewares/chat.js";
 import { generateAPIRoutes } from "./routers/index.js";
+import { onSocketConnection } from "./libs/socket.js";
 
 const initializeServer = async () => {
 	try {
@@ -17,7 +18,7 @@ const initializeServer = async () => {
 		const port = config.server.port;
 		const server = http.createServer(app);
 
-		const io = new Server(server, {
+		global.io = new Server(server, {
 			cors: {
 				origin: [config.client.origin],
 			},
@@ -32,7 +33,7 @@ const initializeServer = async () => {
 			})
 		);
 		app.use(cookieParser());
-		io.use(connectUser);
+		global.io.use(connectUser);
 
 		await connectToDatabase();
 		const apiRoutes = await generateAPIRoutes();
@@ -41,9 +42,9 @@ const initializeServer = async () => {
 		app.use(notFound);
 		app.use(errorHandler);
 
-		io.on("connection", (socket) => {
-			console.log("Server Ping");
-		});
+		global.io.on("connection", (socket) =>
+			onSocketConnection(global.io, socket)
+		);
 
 		server.listen(port, () => {
 			console.log(`Server is up and running on port ${port}`);

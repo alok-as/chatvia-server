@@ -3,6 +3,7 @@ import {
 	createContact,
 	getUserContacts,
 	deleteContacts,
+	getChatContacts,
 } from "../controllers/contact.js";
 
 import { authenticated } from "../middlewares/auth.js";
@@ -13,6 +14,7 @@ const router = Router();
 
 router.post("/", authenticated, validate(contact), createContact);
 router.get("/", authenticated, getUserContacts);
+router.get("/chats", authenticated, getChatContacts);
 router.delete("/", deleteContacts);
 
 export default router;

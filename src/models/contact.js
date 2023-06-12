@@ -22,6 +22,14 @@ const contactSchema = mongoose.Schema(
 				message: ({ value }) => `${value} is not a valid email address`,
 			},
 		},
+		contactId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+		},
+		isRegistered: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{
 		timestamps: true,

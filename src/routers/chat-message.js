@@ -3,6 +3,7 @@ import {
 	sendMessageInChatRoom,
 	getConversationForChatRoom,
 	deleteConversationForChatRoom,
+	getRecentChats,
 } from "../controllers/chat-message.js";
 
 import { authenticated } from "../middlewares/auth.js";
@@ -12,7 +13,10 @@ import { chatMessage } from "../validations/chat-message.js";
 const router = Router();
 
 router.post("/", authenticated, validate(chatMessage), sendMessageInChatRoom);
+
+router.get("/", authenticated, getRecentChats);
 router.get("/:chatRoomId", authenticated, getConversationForChatRoom);
+
 router.delete("/:chatRoomId", authenticated, deleteConversationForChatRoom);
 
 export default router;

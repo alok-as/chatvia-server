@@ -1,9 +1,10 @@
 export const connectUser = (socket, next) => {
-	const username = socket.handshake.auth.username;
+	const id = socket.handshake.auth.id;
 
-	if (!username) {
+	if (!id) {
 		return next(new Error("Unauthenticated!!!"));
 	}
 
+	socket.user = id;
 	next();
 };

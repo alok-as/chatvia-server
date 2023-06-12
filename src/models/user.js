@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { z } from "zod";
 
+import Contact from "./contact.js";
 import config from "../config/index.js";
 
 const userSchema = mongoose.Schema(
@@ -28,6 +29,12 @@ const userSchema = mongoose.Schema(
 		description: {
 			type: String,
 			required: false,
+		},
+		imageUrl: {
+			type: String,
+			required: false,
+			default:
+				"http://chatvia-laravel.themesbrand.website/assets/images/users/avatar-7.jpg",
 		},
 	},
 	{
@@ -72,6 +79,14 @@ userSchema.pre("save", async function (next) {
 	}
 
 	next();
+});
+
+userSchema.post("save", async function (user) {
+	console.log("user._id", user._id);
+	await Contact.updateMany(
+		{ email: user.email },
+		{ $set: { isRegistered: true, contactId: user._id } }
+	);
 });
 
 const User = mongoose.model("User", userSchema);

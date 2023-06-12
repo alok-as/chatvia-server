@@ -33,6 +33,7 @@ export const createUser = asyncHandler(async (req, res) => {
 			accessToken,
 			refreshToken,
 			profile: {
+				id: user._id,
 				username: user.username,
 				email: user.email,
 				description: user.description,
@@ -71,11 +72,23 @@ export const loginUser = asyncHandler(async (req, res) => {
 			accessToken,
 			refreshToken,
 			profile: {
+				id: user._id,
 				username: user.username,
 				email: user.email,
 				description: user.description,
 			},
 		},
+	});
+});
+
+export const getUserProfile = asyncHandler(async (req, res) => {
+	const { id } = req.params;
+	const user = await User.findById(id, "email username imageUrl -_id");
+
+	res.send({
+		data: user,
+		message: "User fetched successfully",
+		success: true,
 	});
 });
 

@@ -25,16 +25,20 @@ chatRoomSchema.statics.initiateChat = async function (userIds, initiator) {
 
 	if (existingRoom) {
 		return {
-			isNew: false,
-			id: existingRoom._id,
+			roomId: existingRoom._id,
 		};
 	}
 
 	const room = await schema.create({ userIds, initiator });
 	return {
-		isNew: true,
-		id: room._id,
+		roomId: room._id,
 	};
+};
+
+chatRoomSchema.statics.getChatRoomsByUserId = async function (userId) {
+	const schema = this;
+	const rooms = await schema.find({ userIds: { $all: [userId] } });
+	return rooms;
 };
 
 const ChatRoom = new mongoose.model("ChatRoom", chatRoomSchema);

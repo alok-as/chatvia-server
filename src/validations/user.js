@@ -5,6 +5,7 @@ export const user = z.object({
 	password: z.string(),
 	email: z.string().email(),
 	description: z.string().optional(),
+	imageUrl: z.string().optional(),
 });
 
 export const login = z.object({

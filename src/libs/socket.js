@@ -1,14 +1,14 @@
-const users = {};
+export const onlineUsers = {};
 
 export const onSocketConnection = (io, socket) => {
 	socket.on("identity", (user) => {
-		const isExisiting = users[socket.id];
+		const isExisiting = onlineUsers[socket.id];
 
 		if (!isExisiting) {
-			users[socket.id] = user;
+			onlineUsers[socket.id] = user;
 		}
 
-		io.emit("usersStatus", users);
+		io.emit("users status", onlineUsers);
 	});
 
 	socket.on("subscribe", (roomId, receiverId) => {
@@ -28,13 +28,13 @@ export const onSocketConnection = (io, socket) => {
 	});
 
 	socket.on("disconnect", () => {
-		delete users[socket.id];
-		io.emit("usersStatus", users);
+		delete onlineUsers[socket.id];
+		io.emit("users status", onlineUsers);
 	});
 };
 
 const getOtherSocketConnection = (otherUserId) => {
-	const userSocket = Object.entries(users).find(
+	const userSocket = Object.entries(onlineUsers).find(
 		([_, userId]) => userId === otherUserId
 	);
 

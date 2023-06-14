@@ -13,11 +13,18 @@ export const onSocketConnection = (io, socket) => {
 
 	socket.on("subscribe", (roomId, receiverId) => {
 		socket.join(roomId);
-		const otherSocket = getOtherSocketConnection(receiverId);
 
-		if (otherSocket) {
-			otherSocket.join(roomId);
+		if (receiverId) {
+			const otherSocket = getOtherSocketConnection(receiverId);
+
+			if (otherSocket) {
+				otherSocket.join(roomId);
+			}
 		}
+	});
+
+	socket.on("unsubscribe", (roomId) => {
+		socket.leave(roomId);
 	});
 
 	socket.on("disconnect", () => {

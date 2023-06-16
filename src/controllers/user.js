@@ -37,6 +37,7 @@ export const createUser = asyncHandler(async (req, res) => {
 				username: user.username,
 				email: user.email,
 				description: user.description,
+				imageUrl: user.imageUrl,
 			},
 		},
 		success: true,
@@ -76,6 +77,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 				username: user.username,
 				email: user.email,
 				description: user.description,
+				imageUrl: user.imageUrl,
 			},
 		},
 	});
@@ -83,7 +85,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const getUserProfile = asyncHandler(async (req, res) => {
 	const { id } = req.params;
-	const user = await User.findById(id, "email username imageUrl -_id");
+	const user = await User.findById(id, "email username imageUrl");
 
 	res.send({
 		data: user,

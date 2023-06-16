@@ -1,4 +1,4 @@
-export const onlineUsers = {};
+const onlineUsers = {};
 
 export const onSocketConnection = (io, socket) => {
 	socket.on("identity", (user) => {
@@ -23,8 +23,20 @@ export const onSocketConnection = (io, socket) => {
 		}
 	});
 
+	socket.on("typing", ({ chatRoomId, senderId }) => {
+		io.sockets.in(chatRoomId).emit("typing", senderId);
+	});
+
+	socket.on("done typing", ({ chatRoomId, senderId }) => {
+		io.sockets.in(chatRoomId).emit("done typing", senderId);
+	});
+
 	socket.on("unsubscribe", (roomId) => {
 		socket.leave(roomId);
+	});
+
+	socket.on("get user status", () => {
+		io.emit("users status", onlineUsers);
 	});
 
 	socket.on("disconnect", () => {

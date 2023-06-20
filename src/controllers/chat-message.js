@@ -3,7 +3,11 @@ import mongoose from "mongoose";
 import ChatMessage from "../models/chat-message.js";
 import ChatRoom from "../models/chat-room.js";
 
-import { asyncHandler } from "../utils/index.js";
+import {
+	aggregatePipelines,
+	asyncHandler,
+	parseQueryParams,
+} from "../utils/index.js";
 
 export const sendMessageInChatRoom = asyncHandler(async (req, res) => {
 	const { _id } = req.user;
@@ -110,58 +114,93 @@ export const getRecentChats = asyncHandler(async (req, res) => {
 
 export const getConversationForChatRoom = asyncHandler(async (req, res) => {
 	const { chatRoomId } = req.params;
+	const { page, perPage, skip, limit } = parseQueryParams(req.query);
 
-	const conversation = await ChatMessage.aggregate([
-		{ $match: { chatRoomId: new mongoose.Types.ObjectId(chatRoomId) } },
-		{
-			$lookup: {
-				from: "users",
-				localField: "sender",
-				foreignField: "_id",
-				as: "sender",
+	const result = await aggregatePipelines(ChatMessage, {
+		conversation: [
+			{ $match: { chatRoomId: new mongoose.Types.ObjectId(chatRoomId) } },
+			{ $sort: { createdAt: -1 } },
+			{
+				$lookup: {
+					from: "users",
+					localField: "sender",
+					foreignField: "_id",
+					as: "sender",
+				},
 			},
-		},
-		{ $unwind: "$sender" },
-		{
-			$lookup: {
-				from: "chatrooms",
-				localField: "chatRoomId",
-				foreignField: "_id",
-				as: "recipients",
+			{ $unwind: "$sender" },
+			{
+				$lookup: {
+					from: "chatrooms",
+					localField: "chatRoomId",
+					foreignField: "_id",
+					as: "recipients",
+				},
 			},
-		},
-		{ $unwind: "$recipients" },
-		{
-			$lookup: {
-				from: "users",
-				localField: "recipients.userIds",
-				foreignField: "_id",
-				as: "recipients",
+			{ $unwind: "$recipients" },
+			{
+				$lookup: {
+					from: "users",
+					localField: "recipients.userIds",
+					foreignField: "_id",
+					as: "recipients",
+				},
 			},
-		},
-		{
-			$project: {
-				id: "$_id",
-				_id: 0,
-				chatRoomId: 1,
-				message: 1,
-				type: 1,
-				"sender._id": 1,
-				"sender.email": 1,
-				"sender.username": 1,
-				"sender.imageUrl": 1,
-				"recipients._id": 1,
-				"recipients.email": 1,
-				"recipients.username": 1,
-				"recipients.imageUrl": 1,
-				createdAt: 1,
+			{
+				$project: {
+					id: "$_id",
+					_id: 0,
+					chatRoomId: 1,
+					message: 1,
+					type: 1,
+					"sender._id": 1,
+					"sender.email": 1,
+					"sender.username": 1,
+					"sender.imageUrl": 1,
+					"recipients._id": 1,
+					"recipients.email": 1,
+					"recipients.username": 1,
+					"recipients.imageUrl": 1,
+					createdAt: 1,
+				},
 			},
-		},
-	]);
+			{ $skip: skip ? parseInt(skip, 10) : 0 },
+			{ $limit: limit ? parseInt(limit, 10) : 10 },
+			{ $sort: { createdAt: 1 } },
+		],
+		pagination: [
+			{ $match: { chatRoomId: new mongoose.Types.ObjectId(chatRoomId) } },
+			{
+				$group: {
+					_id: null,
+					count: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					count: "$count",
+				},
+			},
+		],
+	});
+
+	const total = result.pagination[0]?.count || 0;
 
 	res.send({
 		message: "Conversation fetched successfully",
-		data: conversation,
+		data: result,
+		data: {
+			conversation: result.conversation,
+			pagination: {
+				page,
+				perPage,
+				total,
+				totalPages: Math.ceil(total / perPage),
+			},
+		},
 		success: true,
 	});
 });

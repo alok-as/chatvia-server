@@ -29,6 +29,7 @@ const userSchema = mongoose.Schema(
 		description: {
 			type: String,
 			required: false,
+			default: "Hey Guys, I am on Chatvia.",
 		},
 		imageUrl: {
 			type: String,

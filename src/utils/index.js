@@ -62,3 +62,31 @@ export const generateAuthTokens = async (payload) => {
 		generateJWTToken(payload, refreshExpiry),
 	]);
 };
+
+export const aggregatePipelines = async (Model, pipelines) => {
+	const [result] = await Model.aggregate([
+		{
+			$facet: pipelines,
+		},
+	]);
+
+	return result;
+};
+
+export const parseQueryParams = (queryParams) => {
+	const defaultParams = {
+		page: 1,
+		perPage: 10,
+	};
+
+	let { page, perPage } = Object.assign(defaultParams, queryParams);
+	page = parseInt(page, 10);
+	perPage = parseInt(perPage, 10);
+
+	return {
+		page,
+		perPage,
+		skip: (page - 1) * perPage,
+		limit: perPage,
+	};
+};

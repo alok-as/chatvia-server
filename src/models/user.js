@@ -83,7 +83,6 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.post("save", async function (user) {
-	console.log("user._id", user._id);
 	await Contact.updateMany(
 		{ email: user.email },
 		{ $set: { isRegistered: true, contactId: user._id } }

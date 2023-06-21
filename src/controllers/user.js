@@ -1,6 +1,6 @@
 import User from "../models/user.js";
-import ChatRoom from "../models/chat-room.js";
 import { asyncHandler, generateAuthTokens } from "../utils/index.js";
+import { getCloudinaryImages } from "../libs/cloudinary.js";
 
 export const createUser = asyncHandler(async (req, res) => {
 	const { username, email } = req.body;
@@ -67,8 +67,6 @@ export const loginUser = asyncHandler(async (req, res) => {
 		name: user.username,
 	});
 
-	// const chatRooms = await ChatRoom.find({ userIds: { $in: user._id } });
-
 	res.send({
 		message: "User successfully logged in",
 		success: true,
@@ -82,7 +80,6 @@ export const loginUser = asyncHandler(async (req, res) => {
 				description: user.description,
 				imageUrl: user.imageUrl,
 			},
-			// chatRooms,
 		},
 	});
 });
@@ -94,6 +91,17 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 	res.send({
 		data: user,
 		message: "User fetched successfully",
+		success: true,
+	});
+});
+
+export const getUserAttachments = asyncHandler(async (req, res) => {
+	const { _id } = req.user;
+	const images = await getCloudinaryImages(_id);
+
+	res.send({
+		data: images,
+		message: "User attachments fetched successfully",
 		success: true,
 	});
 });

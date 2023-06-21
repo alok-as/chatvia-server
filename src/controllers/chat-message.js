@@ -11,14 +11,20 @@ import {
 
 export const sendMessageInChatRoom = asyncHandler(async (req, res) => {
 	const { _id } = req.user;
-	const { chatRoomId, message } = req.body;
+	const { chatRoomId, message, type } = req.body;
 
-	const chatMessage = await ChatMessage.sendMessageInChatRoom({
+	const payload = {
 		chatRoomId,
 		message,
 		sender: _id,
-	});
+		type,
+	};
 
+	if (type === "media") {
+		payload.message = req.file.path;
+	}
+
+	const chatMessage = await ChatMessage.sendMessageInChatRoom(payload);
 	global.io.sockets.in(chatRoomId).emit("new message", chatMessage);
 
 	res.status(201).send({

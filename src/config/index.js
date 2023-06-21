@@ -16,6 +16,11 @@ const config = {
 		name: process.env.DATABASE_NAME,
 		url: process.env.DATABASE_URL,
 	},
+	cloudinary: {
+		cloud: process.env.CLOUDINARY_CLOUD_NAME,
+		key: process.env.CLOUDINARY_API_KEY,
+		secret: process.env.CLOUDINARY_API_SECRET,
+	},
 };
 
 export default config;

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const MESSAGE_TYPES = {
 	TEXT: "text",
+	MEDIA: "media",
 };
 
 const chatMessageSchema = mongoose.Schema(
@@ -14,6 +15,7 @@ const chatMessageSchema = mongoose.Schema(
 		type: {
 			type: String,
 			default: MESSAGE_TYPES.TEXT,
+			enum: [MESSAGE_TYPES.TEXT, MESSAGE_TYPES.MEDIA],
 		},
 		message: {
 			type: String,
@@ -34,9 +36,15 @@ chatMessageSchema.statics.sendMessageInChatRoom = async function ({
 	chatRoomId,
 	message,
 	sender,
+	type,
 }) {
 	const schema = this;
-	const newMessage = await schema.create({ chatRoomId, message, sender });
+	const newMessage = await schema.create({
+		chatRoomId,
+		message,
+		sender,
+		type,
+	});
 
 	const chatMessage = await schema.aggregate([
 		{

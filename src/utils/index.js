@@ -90,3 +90,4 @@ export const parseQueryParams = (queryParams) => {
 		limit: perPage,
 	};
 };
+

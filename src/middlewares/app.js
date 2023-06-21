@@ -3,6 +3,7 @@ import { fromZodError } from "zod-validation-error";
 export const validate =
 	(schema, property = "body") =>
 	(req, res, next) => {
+		console.log("Req", req.file, req.body);
 		const { error, success } = schema.safeParse(req[property]);
 		if (success) return next();
 
